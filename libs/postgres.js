@@ -1,12 +1,14 @@
 const { Client } = require('pg');
 
+const { config } = require('../config/config');
+
+const USER = encodeURIComponent(config.db.user);
+const PASSWORD = encodeURIComponent(config.db.password);
+const URI = `postgres://${USER}:${PASSWORD}@${config.db.host}:${config.db.port}/${config.db.database}`;
+
 async function getConnection() {
   const client = new Client({
-    host: 'localhost',
-    port: 5432,
-    user: 'admin',
-    password: '1234',
-    database: 'store'
+    connectionString: URI,
   });
   await client.connect();
   return client;
