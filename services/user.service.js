@@ -6,7 +6,15 @@ class UserService {
   constructor() {}
 
   async create(data) {
-    return data;
+    try {
+      const newUser = await models.User.create(data);
+      return newUser;
+    } catch (error) {
+      if(error.original.code === '23505') {
+        throw boom.conflict('Email already exists');
+      }
+      throw boom.badRequest(error);
+    }
   }
 
   async find() {
@@ -15,17 +23,22 @@ class UserService {
   }
 
   async findOne(id) {
-    return { id };
+    const user = await models.User.findByPk(id);
+    if (!user) {
+      throw boom.notFound('user not found');
+    }
+    return user;
   }
 
   async update(id, changes) {
-    return {
-      id,
-      changes,
-    };
+    const user = await this.findOne(id);
+    const rta = user.update(changes);
+    return rta;
   }
 
   async delete(id) {
+    const user = await this.findOne(id);
+    await user.destroy();
     return { id };
   }
 }
