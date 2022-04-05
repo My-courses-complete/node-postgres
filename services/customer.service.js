@@ -7,15 +7,22 @@ class CustomerService {
 
 	async create(data) {
 		try {
-			const newCustomer = await models.Customer.create(data);
+			const newCustomer = await models.Customer.create(data, {
+				include: ['user']
+			});
 			return newCustomer;
 		} catch (error) {
+			if (error.name === 'SequelizeUniqueConstraintError') {
+				throw boom.conflict(error.errors[0].message);
+			}
 			throw boom.badRequest(error);
 		}
 	}
 
 	async find() {
-		const rta = await models.Customer.findAll();
+		const rta = await models.Customer.findAll({
+			include: ['user']
+		});
 		return rta;
 	}
 
