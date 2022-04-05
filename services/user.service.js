@@ -11,7 +11,10 @@ class UserService {
       return newUser;
     } catch (error) {
       if(error.original.code === '23505') {
-        throw boom.conflict('Email already exists');
+        if (error.original.detail.includes('email')) {
+          throw boom.conflict('Email already exists');
+        }
+        throw boom.badRequest(error);
       }
       throw boom.badRequest(error);
     }
