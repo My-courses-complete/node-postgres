@@ -9,7 +9,8 @@ const config = {
 		user: process.env.DB_USER || 'admin',
 		password: process.env.DB_PASSWORD || '1234',
 		database: process.env.DB_DATABASE || 'store'
-	}
+	},
+	apiKey: process.env.API_KEY || '1234'
 };
 
 module.exports = { config };
