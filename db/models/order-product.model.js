@@ -41,7 +41,7 @@ const OrderProductSchema = {
 		},
 		onUpdate: 'CASCADE',
 		onDelete: 'SET NULL'
-	}
+	},
 }
 
 class OrderProduct extends Model {
