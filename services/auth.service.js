@@ -31,11 +31,31 @@ class AuthService {
 			token
 		};
 	}
-	async sendMail(email) {
-		const user = await service.findByEmail(email)
+
+	async sendRecovery(email) {
+		const user = await service.findByEmail(email);
 		if (!user) {
 			throw boom.unauthorized();
 		}
+		const payload = {
+			id: user.id,
+			role: user.role,
+		}
+		const token = jwt.sign(payload, config.jwtSecret, { expiresIn: '15min' });
+		const link = `${config.host}/recovery/${token}`;
+		await service.update(user.id, { recoveryToken: token });
+		const infoMail = {
+			from: config.email.host, // sender address
+			to: `${user.email}`, // list of receivers
+			subject: "Hello ✔", // Subject line
+			text: "Hello world?", // plain text body
+			html: `<b>Ingresa a este link => ${link}</b>`, // html body
+		};
+		const rta = await this.sendMail(infoMail);
+		return rta;
+	}
+
+	async sendMail(infoMail) {
 		let transporter = nodemailer.createTransport({
 			host: "smtp.gmail.com",
 			secure: false, // true for 465, false for other ports
@@ -45,14 +65,8 @@ class AuthService {
 				pass: config.email.password
 			}
 		});
-		await transporter.sendMail({
-			from: config.email.host, // sender address
-			to: `${user.email}`, // list of receivers
-			subject: "Hello ✔", // Subject line
-			text: "Hello world?", // plain text body
-			html: "<b>Hello world?</b>", // html body
-		});
-		return { message: 'mail sended'}
+		await transporter.sendMail(infoMail);
+		return { message: 'mail sended' }
 	}
 }
 
