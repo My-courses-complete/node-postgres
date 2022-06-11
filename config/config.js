@@ -12,6 +12,10 @@ const config = {
 	},
 	apiKey: process.env.API_KEY || '1234',
 	jwtSecret: process.env.JWT_SECRET || '1234',
+	email: {
+		host: process.env.EMAIL_HOST,
+		password: process.env.EMAIL_PASSWORD,
+	}
 };
 
 module.exports = { config };

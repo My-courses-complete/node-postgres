@@ -16,7 +16,6 @@ const LocalStrategy = new Strategy({
         done(boom.unauthorized(), false);
       }
       const isMatch = await bcrypt.compare(password, user.password);
-	  console.log('Hola')
       if (!isMatch) {
         done(boom.unauthorized(), false);
       }
