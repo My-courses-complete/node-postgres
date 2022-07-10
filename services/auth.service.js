@@ -38,8 +38,7 @@ class AuthService {
 			throw boom.unauthorized();
 		}
 		const payload = {
-			id: user.id,
-			role: user.role,
+			id: user.id
 		}
 		const token = jwt.sign(payload, config.jwtSecret, { expiresIn: '15min' });
 		const link = `${config.host}/recovery/${token}`;
@@ -53,6 +52,21 @@ class AuthService {
 		};
 		const rta = await this.sendMail(infoMail);
 		return rta;
+	}
+
+	async changePassword(token, password) {
+		try {
+			const payload = jwt.verify(token, config.jwtSecret);
+			const user = await service.findOne(payload.id);
+			if (!user || user.recoveryToken !== token) {
+				throw boom.unauthorized();
+			}
+			const hash = await bcrypt.hash(password, 10);
+			await service.update(user.id, { password: hash, recoveryToken: null });
+			return "Se cambio la contraseña";
+		} catch (error) {
+			throw boom.unauthorized();
+		}
 	}
 
 	async sendMail(infoMail) {
